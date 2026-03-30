@@ -1,6 +1,6 @@
 ## 📸 Aperçu
 
-![Todo App](screenshots/home.png)
+![Todo App](screenshots/index.png)
 # 📝 Todo App – Symfony
 
 ## 🚀 Description
