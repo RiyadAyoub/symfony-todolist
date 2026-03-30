@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ma Todo List{% endblock %}
+
+{% block body %}
+<div style="max-width: 500px; margin: 50px auto; font-family: sans-serif;">
+    <h1>✅ Ma To-do List</h1>
+
+    {# Formulaire pour ajouter une tâche #}
+    <form action="{{ path('app_todo_add') }}" method="POST" style="margin-bottom: 20px;">
+        <input type="text" name="title" placeholder="Quoi de neuf ?" required 
+               style="padding: 10px; width: 70%;">
+        <button type="submit" style="padding: 10px; cursor: pointer;">Ajouter</button>
+    </form>
+
+    <hr>
+
+    {# Liste des tâches #}
+    <ul style="list-style: none; padding: 0;">
+    {% for task in tasks %}
+        <li style="padding: 10px; border-bottom: 1px solid #eee; display: flex; align-items: center;">
+            
+            {# On entoure la checkbox et le titre d'un lien vers la route toggle #}
+            <a href="{{ path('app_todo_toggle', {'id': task.id}) }}" 
+               style="text-decoration: none; color: inherit; display: flex; align-items: center; flex-grow: 1;">
+                
+                <input type="checkbox" 
+       {{ task.isDone ? 'checked' : '' }} 
+       onclick="window.location.href='{{ path('app_todo_toggle', {'id': task.id}) }}'"
+       style="margin-right: 10px; cursor: pointer;">
+                
+                <span style="{{ task.isDone ? 'text-decoration: line-through; color: gray;' : '' }}">
+                    {{ task.title }}
+                </span>
+            </a>
+
+            <a href="{{ path('app_todo_delete', {'id': task.id}) }}" 
+               style="color: #ff4d4d; text-decoration: none; font-weight: bold;"
+               onclick="return confirm('Supprimer ?')">
+               Supprimer
+            </a>
+        </li>
+    {% endfor %}
+</ul>
+</div>
+{% endblock %}
