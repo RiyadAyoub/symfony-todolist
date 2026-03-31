@@ -1,11 +1,16 @@
+# 📝 Todo App – Symfony
+
+🌍 **Démo en ligne :** https://symfony-todolist.onrender.com
+
 ## 📸 Aperçu
 
 ![Todo App](screenshots/index.png)
-# 📝 Todo App – Symfony
 
 ## 🚀 Description
 
 Cette application est une **Todo List développée avec Symfony**, permettant aux utilisateurs de gérer leurs tâches quotidiennes de manière simple et efficace.
+
+Ce projet démontre ma capacité à concevoir, développer et déployer une application web complète avec un framework professionnel.
 
 Ce projet a été réalisé dans le but de :
 
@@ -23,18 +28,18 @@ Ce projet a été réalisé dans le but de :
 * ❌ Suppression de tâches
 * 📋 Affichage de la liste des tâches
 * ✔️ Marquer une tâche comme terminée
-* 🗄️ Stockage en base de données (SQLite)
+* 🗄️ Stockage en base de données (PostgreSQL / MySQL)
 
 ---
 
 ## 🛠️ Technologies utilisées
 
-* PHP
-* Symfony
-* Doctrine ORM
-* Twig
-* SQLite
-* HTML / CSS
+- PHP  
+- Symfony  
+- Doctrine ORM  
+- Twig  
+- PostgreSQL (production) / MySQL (local)  
+- Docker  
 
 ---
 
@@ -49,16 +54,24 @@ Ce projet a été réalisé dans le but de :
 
 ## 🧱 Base de données
 
-L'application utilise **SQLite** avec Doctrine.
+L'application utilise **Doctrine ORM**, ce qui permet une compatibilité avec plusieurs systèmes de gestion de base de données.
 
-Entité principale :
+En pratique :
+- PostgreSQL en production (Render)
+- MySQL en local
 
-* **Task**
+### Entité principale :
 
-  * title (string)
-  * description (text, nullable)
-  * isDone (boolean)
-  * createdAt (datetime)
+- **Task**
+  - title (string)
+  - description (text, nullable)
+  - isDone (boolean)
+  - createdAt (datetime)
+
+## 🚀 Déploiement
+
+L'application est conteneurisée avec Docker et déployée sur Render.
+
 
 ---
 
@@ -67,7 +80,7 @@ Entité principale :
 ### 1. Cloner le projet
 
 ```bash
-git clone https://github.com/ton-username/todo-app.git
+git clone https://github.com/RiyadAyoub/symfony-todolist
 cd todo-app
 ```
 
@@ -115,7 +128,6 @@ Ce projet m’a permis de :
 * 🔐 Système d’authentification (login/register)
 * 👤 Association des tâches à un utilisateur
 * 🎨 Amélioration de l’interface (Bootstrap / Tailwind)
-* 🌐 Déploiement en ligne
 * 📱 Responsive design
 
 ---
