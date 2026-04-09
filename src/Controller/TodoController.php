@@ -2,22 +2,27 @@
 
 namespace App\Controller;
 
-use App\Entity\Task;
-use App\Repository\TaskRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route; // Note l'utilisation de 'Attribute' ici
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\Attribute\Route;
 
 class TodoController extends AbstractController
 {
-    // ... le reste de ton code
-    #[Route('/', name: 'app_todo')]
-    public function index(TaskRepository $repository): Response
+    private $session;
+
+    public function __construct(RequestStack $requestStack)
     {
-        // On récupère toutes les tâches de la base de données
-        $tasks = $repository->findAll();
+        // Dès que le contrôleur est appelé, on prépare l'accès à la session
+        $this->session = $requestStack->getSession();
+    }
+
+    #[Route('/', name: 'app_todo')]
+    public function index(): Response
+    {
+        // On récupère le tableau 'tasks' dans la session. S'il n'existe pas, on renvoie un tableau vide []
+        $tasks = $this->session->get('tasks', []);
 
         return $this->render('todo/index.html.twig', [
             'tasks' => $tasks,
@@ -25,43 +30,56 @@ class TodoController extends AbstractController
     }
 
     #[Route('/add', name: 'app_todo_add', methods: ['POST'])]
-    public function add(Request $request, EntityManagerInterface $em): Response
+    public function add(Request $request): Response
     {
-        // On récupère le texte envoyé par le formulaire
         $title = $request->request->get('title');
+        $tasks = $this->session->get('tasks', []);
 
         if ($title) {
-            $task = new Task();
-            $task->setTitle($title);
-            $task->setIsDone(false);
-
-            // On dit à Symfony de sauvegarder
-            $em->persist($task);
-            $em->flush();
+            // Au lieu d'utiliser l'entité Task, on crée un simple tableau associatif
+            $newTask = [
+                'id' => uniqid(), // On génère un identifiant textuel unique
+                'title' => $title,
+                'isDone' => false
+            ];
+            
+            $tasks[] = $newTask; // On ajoute la nouvelle tâche au tableau
+            $this->session->set('tasks', $tasks); // On sauvegarde le tableau mis à jour en session
         }
 
         return $this->redirectToRoute('app_todo');
     }
+
     #[Route('/delete/{id}', name: 'app_todo_delete')]
-    public function delete(Task $task, EntityManagerInterface $em): Response
+    public function delete(string $id): Response
     {
-        // Symfony est magique : il voit {id} dans l'URL et va chercher 
-        // automatiquement la tâche correspondante dans la base !
+        $tasks = $this->session->get('tasks', []);
 
-        $em->remove($task); // On prépare la suppression
-        $em->flush();       // On exécute la requête SQL
+        // On filtre le tableau pour conserver toutes les tâches SAUF celle qui a cet ID
+        $tasks = array_filter($tasks, function($task) use ($id) {
+            return $task['id'] !== $id;
+        });
 
-        // On revient sur la page d'accueil
+        $this->session->set('tasks', $tasks);
+
         return $this->redirectToRoute('app_todo');
     }
+
     #[Route('/toggle/{id}', name: 'app_todo_toggle')]
-public function toggle(Task $task, EntityManagerInterface $em): Response
-{
-    // On inverse l'état actuel : si c'est true, ça devient false, et inversement
-    $task->setIsDone(!$task->isDone());
+    public function toggle(string $id): Response
+    {
+        $tasks = $this->session->get('tasks', []);
 
-    $em->flush(); // Pas besoin de persist() ici car l'objet existe déjà dans la BDD
+        // On parcourt le tableau pour trouver la bonne tâche et inverser son statut
+        foreach ($tasks as &$task) {
+            if ($task['id'] === $id) {
+                $task['isDone'] = !$task['isDone'];
+                break;
+            }
+        }
 
-    return $this->redirectToRoute('app_todo');
-}
+        $this->session->set('tasks', $tasks);
+
+        return $this->redirectToRoute('app_todo');
+    }
 }
